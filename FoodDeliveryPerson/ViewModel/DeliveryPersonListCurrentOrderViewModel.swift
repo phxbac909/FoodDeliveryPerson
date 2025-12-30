@@ -35,7 +35,7 @@ class DeliveryPersonListCurrentOrderViewModel : ObservableObject {
                             self?.shippingdOrder = try await self?.orderRepository.getOrderByDeliveryPersonIdAndStatus(
                                 deliveryPersonId: updatedOrder.deliveryPersonId ?? -1,
                                 orderStatus: "SHIPPING"
-                            )
+                            ).first
                         }
                         else if let currentShippingOrder = self?.shippingdOrder
                            {
@@ -54,7 +54,7 @@ class DeliveryPersonListCurrentOrderViewModel : ObservableObject {
     
     func loadListOrder() async{
         do {
-            self.shippingdOrder = try await orderRepository.getOrderByDeliveryPersonIdAndStatus(deliveryPersonId: userData.user?.id ?? 0, orderStatus: "SHIPPING")
+            self.shippingdOrder = try await orderRepository.getOrderByDeliveryPersonIdAndStatus(deliveryPersonId: userData.user?.id ?? 0, orderStatus: "SHIPPING").first
             self.confirmedOrder = try await orderRepository.getOrdersByStatus(orderStatus: "CONFIRMED")
         } catch {
             print(error.localizedDescription)

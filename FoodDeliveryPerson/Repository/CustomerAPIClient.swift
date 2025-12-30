@@ -9,7 +9,7 @@ import Foundation
 
 class CustomerAPIClient {
     
-    private let baseURL = Config.serverIP + "/customer"
+    private let baseURL = Config.urlHTTP + "/customer"
     private let session: URLSession
     
     init(session: URLSession = .shared) {
@@ -49,7 +49,7 @@ class CustomerAPIClient {
     // MARK: - Helper Method
     private func validateResponse(_ response: URLResponse) throws {
         guard let httpResponse = response as? HTTPURLResponse else {
-            throw APIError.invalidResponse
+            throw ApiError.invalidResponse
         }
         print("Code :  \(httpResponse.statusCode)" )
     }

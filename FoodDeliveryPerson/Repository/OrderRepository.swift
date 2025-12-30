@@ -76,11 +76,11 @@ class OrderRepository {
     }
     
     func getOrdersByStatus(orderStatus: String) async throws -> [OrderDto] {
-        let encodedStatus = orderStatus.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? orderStatus
-        let urlString = "\(baseURL)/status/\(encodedStatus)"
+//        let encodedStatus = orderStatus.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? /*orderStatus*/
+        let urlString = "\(baseURL)/status/\(orderStatus)"
         
         guard let url = URL(string: urlString) else {
-            throw APIError.invalidURL
+            throw ApiError.invalidURL
         }
         
         var request = URLRequest(url: url)
@@ -92,4 +92,44 @@ class OrderRepository {
         let decoder = JSONDecoder()
         return try decoder.decode([OrderDto].self, from: data)
     }
+
+    // MARK: - Get Order by Delivery Person ID and Status
+    func getOrderByDeliveryPersonIdAndStatus(
+        deliveryPersonId: Int64,
+        orderStatus: String
+    ) async throws -> [OrderDto] {
+        
+        let urlString = "\(baseURL)/delivery-person-id/\(deliveryPersonId)/status/\(orderStatus)"
+        
+        guard let url = URL(string: urlString) else {
+            throw ApiError.invalidURL
+        }
+        
+        var request = URLRequest(url: url)
+        request.httpMethod = "GET"
+        
+        let (data, response) = try await session.data(for: request)
+        try validateResponse(response)
+        let decoder = JSONDecoder()
+        return try decoder.decode([OrderDto].self, from: data)
+    }
+    
+    // MARK: - Assign Delivery Person to Order
+    func assignDeliveryPersonToOrder(orderId: Int64, deliveryPersonId: Int64) async throws {
+        let urlString = "\(baseURL)/\(orderId)/delivery-person/\(deliveryPersonId)"
+        
+        guard let url = URL(string: urlString) else {
+            throw ApiError.invalidURL
+        }
+        
+        var request = URLRequest(url: url)
+        request.httpMethod = "PUT"
+        // Không cần Content-Type vì không có body
+        
+        let (_, response) = try await session.data(for: request)
+        try validateResponse(response)
+        
+        // Không decode data vì response body rỗng (200 OK với Void)
+    }
+
 }

@@ -1,3 +1,11 @@
+//
+//  DeliveryPersonAccountView.swift
+//  FoodDeliveryPerson
+//
+//  Created by TTC on 30/12/25.
+//
+
+
 import SwiftUI
 
 struct DeliveryPersonAccountView: View {
@@ -5,11 +13,11 @@ struct DeliveryPersonAccountView: View {
         Button{
             UserData.shared.clear()
         } label: {
-            Text("Log out \(UserData.shared.user?.id ) ")
+            Text("Log out \(UserData.shared.user?.username ?? "No User" ) ")
         }
     }
 }
 
 #Preview {
-    ShopAccountView()
+    DeliveryPersonAccountView()
 }

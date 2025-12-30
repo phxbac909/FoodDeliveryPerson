@@ -10,35 +10,44 @@ import SwiftUI
 // MARK: - DeliveryPersonListOrderView
 struct DeliveryPersonListCurrentOrderView: View {
     @StateObject private var viewModel = DeliveryPersonListCurrentOrderViewModel()
- 
-    
+     
     var body: some View {
         NavigationView {
-            ScrollView {
-                LazyVStack(spacing: 16) {
-                    if let order = viewModel.shippingdOrder
-                    {
-                        DeliveryPersonOrderView(
-                            order: order)
-                    }
-                    else {
-                        ForEach(viewModel.confirmedOrder, id: \.id) { order in
-                            DeliveryPersonOrderView(
-                                order: order)
+            ZStack{
+                if let order = viewModel.shippingdOrder {
+                    DeliveryPersonOrderView(
+                        order: order)
+                }
+                else if(viewModel.confirmedOrder.count > 0) {
+                    ScrollView {
+                        LazyVStack(spacing: 16) {
+                            ForEach(viewModel.confirmedOrder, id: \.id) { order in
+                                DeliveryPersonOrderView(
+                                    order: order)
+                            }
                         }
                     }
+                    .padding()
                 }
-                .padding()
+                else {
+                    Spacer()
+                    EmptyOrderView()
+                    Spacer()
+                }
             }
-            .navigationTitle(viewModel.shippingdOrder == nil ? "Order avaiable" : "Current Order")
+            .navigationTitle( "Order Avaiable")
             .navigationBarTitleDisplayMode(.large)
-        }.onAppear{
-            Task{
-                await viewModel.loadListOrder();
+            .onAppear{
+                Task{
+                    await viewModel.loadListOrder();
+                }
             }
         }
+            
+            
+        }
     }
-}
+
 
 // MARK: - Preview
 struct DeliveryPersonListOrderView_Previews: PreviewProvider {

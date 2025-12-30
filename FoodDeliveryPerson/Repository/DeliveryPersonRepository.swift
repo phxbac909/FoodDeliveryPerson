@@ -1,4 +1,12 @@
-/ MARK: - API Client
+//
+//  DeliveryPersonRepository.swift
+//  FoodDeliveryPerson
+//
+//  Created by TTC on 30/12/25.
+//
+
+import Foundation
+
 class DeliveryPersonRepository {
     private let baseURL = Config.urlHTTP + "/delivery-person"
     private let session: URLSession
@@ -40,18 +48,33 @@ class DeliveryPersonRepository {
     // MARK: - Helper Method
     private func validateResponse(_ response: URLResponse) throws {
         guard let httpResponse = response as? HTTPURLResponse else {
-            throw APIError.invalidResponse
+            throw ApiError.invalidResponse
         }
         
         switch httpResponse.statusCode {
         case 200...299:
             return
         case 404:
-            throw APIError.notFound
+            throw ApiError.notFound
         case 409:
-            throw APIError.conflict
+            throw ApiError.conflict
         default:
-            throw APIError.serverError(statusCode: httpResponse.statusCode)
+            throw ApiError.serverError(statusCode: httpResponse.statusCode)
         }
+    }
+    
+    // MARK: - Assign Delivery Person to Order
+    func assignToOrder(orderId: Int64, deliveryPersonId: Int64) async throws {
+        let urlString = "\(baseURL)/\(orderId)/delivery-person/\(deliveryPersonId)"
+        guard let url = URL(string: urlString) else {
+            throw ApiError.invalidURL
+        }
+        
+        var request = URLRequest(url: url)
+        request.httpMethod = "PUT"
+        
+        let (_, response) = try await session.data(for: request)
+        try validateResponse(response)
+        
     }
 }

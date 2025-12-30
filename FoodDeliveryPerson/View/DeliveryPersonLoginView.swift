@@ -1,4 +1,12 @@
 //
+//  DeliveryPersonLoginView.swift
+//  FoodDeliveryPerson
+//
+//  Created by TTC on 30/12/25.
+//
+
+
+//
 //  LoginView.swift
 //  FoodOrder
 //
@@ -9,7 +17,7 @@ import SwiftUI
 
 struct DeliveryPersonLoginView: View {
     
-    @StateObject var viewModel = ShopLoginViewModel()
+    @StateObject var viewModel = DeliveryPersonLoginViewModel()
     @FocusState private var focusedField: Field?
     private var isLogable : Bool {viewModel.username.isEmpty||viewModel.password.isEmpty}
     @State private var isLoginForm : Bool = true
@@ -30,7 +38,7 @@ struct DeliveryPersonLoginView: View {
                     Color("backgroundColor")
                     VStack(spacing: 10){
                         
-                        Text("Welcome to NvrnApp")
+                        Text("Welcome, Delivery Person")
                             .font(.largeTitle).bold()
                             .fontWeight(.semibold)
                             .padding(.top,30)
@@ -54,7 +62,7 @@ struct DeliveryPersonLoginView: View {
     private var registerForm : some View {
         VStack{
             
-            Text("Join and become our partner")
+            Text("Join and become our delivery person")
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
                 .padding(.bottom,40)
@@ -214,10 +222,10 @@ struct DeliveryPersonLoginView: View {
     }
 }
 
-enum ShopField {
+enum Field {
         case field1, field2, field3, field4
     }
 
 #Preview {
-    ShopLoginView()
+    DeliveryPersonLoginView()
 }

@@ -9,9 +9,15 @@ import SwiftUI
 
 @main
 struct FoodDeliveryPersonApp: App {
+   
+    init(){
+        _ = WebSocketManager.shared
+    }
+    
+
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            DeliveryPersonContentView()
         }
     }
 }

@@ -8,5 +8,6 @@
 import Foundation
 
 class Config {
-    static let serverIP : String = "http://192.168.1.6:8080"
+        static let ip = "192.168.1.6";
+        static let urlHTTP : String = "http://\(ip):8080"
 }

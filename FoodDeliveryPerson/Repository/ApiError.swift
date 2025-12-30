@@ -6,11 +6,12 @@
 //
 
 
-enum APIError: Error {
+enum ApiError: Error {
     case invalidResponse
     case badRequest
     case notFound
     case serverError(statusCode: Int)
     case conflict
     case noContent
+    case invalidURL
 }

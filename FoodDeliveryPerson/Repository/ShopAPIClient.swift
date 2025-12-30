@@ -9,7 +9,7 @@
 import Foundation
 
 class ShopAPIClient {
-    private let baseURL = Config.serverIP + "/shops" // Thay bằng URL thực tế của bạn
+    private let baseURL = Config.urlHTTP + "/shops" // Thay bằng URL thực tế của bạn
     private let session: URLSession
     
     init(session: URLSession = .shared) {
@@ -149,18 +149,18 @@ class ShopAPIClient {
     // MARK: - Helper Methods
     private func validateResponse(_ response: URLResponse) throws {
         guard let httpResponse = response as? HTTPURLResponse else {
-            throw APIError.invalidResponse
+            throw ApiError.invalidResponse
         }
         
         switch httpResponse.statusCode {
         case 200...299:
             return
         case 400:
-            throw APIError.badRequest
+            throw ApiError.badRequest
         case 404:
-            throw APIError.notFound
+            throw ApiError.notFound
         default:
-            throw APIError.serverError(statusCode: httpResponse.statusCode)
+            throw ApiError.serverError(statusCode: httpResponse.statusCode)
         }
     }
     

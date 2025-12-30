@@ -1,5 +1,5 @@
 //
-//  LoginViewModel.swift
+//  DeliveryPersonLoginViewModel.swift
 //  FoodOrder
 //
 //  Created by TTC on 7/3/25.
@@ -7,32 +7,31 @@
 
 import Foundation
 
-class ShopLoginViewModel : ObservableObject {
+class DeliveryPersonLoginViewModel: ObservableObject {
     
-    @Published var username : String = ""
-    @Published var fullName : String = ""
-    @Published var password : String = ""
-    @Published var isWrongAccount : Bool = false
-    @Published var isDuplicateAcountName : Bool = false
+    @Published var username: String = ""
+    @Published var fullName: String = ""
+    @Published var password: String = ""
+    @Published var isWrongAccount: Bool = false
+    @Published var isDuplicateAcountName: Bool = false
     @Published var isLogging: Bool = false
-    @Published var isSigning : Bool = false
-    let authClient = ShopAPIClient()
-
+    @Published var isSigning: Bool = false
+    let authClient = DeliveryPersonRepository()
     
-    func login( ) async  {
+    func login() async {
         isLogging = true
         
         do {
-            let shop = try await authClient.login(username: username, password: password)
-            if let shop = shop {
+            let deliveryPerson = try await authClient.login(username: username, password: password)
+            if let deliveryPerson = deliveryPerson {
                 isWrongAccount = false
-                UserData.shared.saveShop(shop)
-                print(shop)
+                UserData.shared.saveUser(deliveryPerson)
+                print(deliveryPerson)
                 isLogging = false
             } else {
                 print("Login failed: User not found")
             }
-        }  catch {
+        } catch {
             isWrongAccount = true
         }
         isLogging = false
@@ -40,19 +39,19 @@ class ShopLoginViewModel : ObservableObject {
     
     func register() async {
         isSigning = true
-        let shopRequest = ShopRequest(username: username, password: password, name : fullName)
-            do {
-                let shop = try await authClient.register(shopRequest: shopRequest)
-                print(shop)
-                UserData.shared.saveShop(shop)
-                isSigning = false
-            } catch APIError.serverError(statusCode: 500) {
-                print("error 500")
-                isDuplicateAcountName = true
-                isSigning = false
-            } catch {
-                print("Error: \(error.localizedDescription)")
-                isSigning = false
-            }
+        let deliveryPersonRequest = DeliveryPersonRequest(username: username, password: password, fullName: fullName)
+        do {
+            let deliveryPerson = try await authClient.register(deliveryPersonRequest: deliveryPersonRequest)
+            print(deliveryPerson)
+            UserData.shared.saveUser(deliveryPerson)
+            isSigning = false
+        } catch ApiError.conflict {
+            print("Duplicate account")
+            isDuplicateAcountName = true
+            isSigning = false
+        } catch {
+            print("Error: \(error.localizedDescription)")
+            isSigning = false
         }
+    }
 }

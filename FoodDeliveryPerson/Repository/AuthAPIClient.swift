@@ -9,7 +9,7 @@
 import Foundation
 
 class AuthAPIClient {
-    private let baseURL =  Config.serverIP + "/auth"
+    private let baseURL =  Config.urlHTTP + "/auth"
     private let session: URLSession
     
     init(session: URLSession = .shared) {
@@ -49,18 +49,18 @@ class AuthAPIClient {
     // MARK: - Helper Method
     private func validateResponse(_ response: URLResponse) throws {
         guard let httpResponse = response as? HTTPURLResponse else {
-            throw APIError.invalidResponse
+            throw ApiError.invalidResponse
         }
         
         switch httpResponse.statusCode {
         case 200...299:
             return
         case 404:
-            throw APIError.notFound
+            throw ApiError.notFound
         case 409:
-            throw APIError.conflict
+            throw ApiError.conflict
         default:
-            throw APIError.serverError(statusCode: httpResponse.statusCode)
+            throw ApiError.serverError(statusCode: httpResponse.statusCode)
         }
     }
 }

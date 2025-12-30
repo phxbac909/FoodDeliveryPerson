@@ -9,54 +9,40 @@
 import Foundation
 
 class UserData: ObservableObject {
+
     static let shared = UserData()
     private let defaults = UserDefaults.standard
     
     private enum Keys {
-        static let userData = "customerData"
-        static let userType = "userType"
+        static let userKey = "user"
     }
     
     @Published var user: UserResponse? {
         didSet {
             if let encoded = try? JSONEncoder().encode(user) {
-                defaults.set(encoded, forKey: Keys.userData)
+                defaults.set(encoded, forKey: Keys.userKey)
             } else {
-                defaults.removeObject(forKey: Keys.userData)
+                defaults.removeObject(forKey: Keys.userKey)
             }
         }
     }
-    @Published var isCustomer : Bool? {
-        didSet {
-            if let type = isCustomer  {
-                defaults.set(type, forKey: Keys.userType)
-            } else {
-                defaults.removeObject(forKey: Keys.userType)
-            }
-        }
-    }
-
+  
     
     init() {
         // Khởi tạo từ UserDefaults
-        if let data = defaults.data(forKey: Keys.userData),
-           let savedCustomer = try? JSONDecoder().decode(UserResponse.self, from: data) {
-            self.user = savedCustomer
+        if let data = defaults.data(forKey: Keys.userKey),
+           let savedUser = try? JSONDecoder().decode(UserResponse.self, from: data) {
+            self.user = savedUser
         } else {
             self.user = nil
         }
-        if defaults.object(forKey: Keys.userType) != nil {
-            self.isCustomer = defaults.bool(forKey: Keys.userType)
-        }
     }
     
-    func saveCustomer(_ customer: UserResponse) {
-        self.user = customer
-        isCustomer = true
-    }
-    func saveShop(_ shop: UserResponse) {
-        self.user = shop
-        isCustomer = false
+ 
+    func saveUser(_ deliverPerson : DeliveryPersonResponse){
+        self.user = UserResponse(id: deliverPerson.id ?? -1, username: deliverPerson.username)
+        
+        
     }
     
     func clear() {

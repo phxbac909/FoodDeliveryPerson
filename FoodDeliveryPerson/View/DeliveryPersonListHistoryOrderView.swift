@@ -1,140 +1,117 @@
-//
-//  DeliveryPersonListHistoryOrder.swift
-//  FoodDeliveryPerson
-//
-//  Created by TTC on 30/12/25.
-//
-
 import SwiftUI
 
 struct DeliveryPersonListHistoryOrderView: View {
-    @StateObject var viewModel = ShopListOrderViewModel()
-    private var user = UserData.shared.user
+    
+    @StateObject var viewModel = DeliveryPersonListHistoryOrderViewModel()
+    @State private var selectedTab: String = OrderStatus.DONE.title
+    private let tabs = [OrderStatus.DONE.title, OrderStatus.CANCELED.title]
     
     var body: some View {
-        NavigationView{
-            VStack(spacing: 0){
-                ScrollViewReader { proxy in
-                    ScrollView(.horizontal, showsIndicators: false){
-                        tabOrder
-                            .onChange(of: viewModel.selectedTab) { oldValue, newValue in
-                                withAnimation {
-                                    proxy.scrollTo(newValue, anchor: .center)
-                                }
-                        }
-                    }
-                }
-                TabView(selection: $viewModel.selectedTab) {
-                    ForEach(viewModel.tab, id: \.self) { statusTitle in
-                        contentView(for: statusTitle)
-                            .tag(statusTitle)
-                    }
+        NavigationView {
+            VStack(spacing: 0) {
+                tabBar
+                
+                TabView(selection: $selectedTab) {
+                    listDoneOrderView
+                        .tag(OrderStatus.DONE.title)
+                    
+                    listCanceledOrderView
+                        .tag(OrderStatus.CANCELED.title)
                 }
                 .tabViewStyle(.page(indexDisplayMode: .never))
             }
-            .navigationTitle("Order History")
-        }
-        .onAppear{
-            Task{
-                await viewModel.loadOrder(shopId: user?.id ?? -1)
+            .onAppear{
+                Task{
+                    await viewModel.loadListOrder()
+                }
             }
+            .navigationTitle("Order History")
         }
     }
     
-    // Content cho mỗi tab
-    @ViewBuilder
-    private func contentView(for statusTitle: String) -> some View {
-        let filteredOrders = viewModel.orders.filter { $0.status.title == statusTitle }
-        
+    // MARK: - List Done Order View
+    private var listDoneOrderView: some View {
         ZStack {
-            if filteredOrders.isEmpty {
-                VStack{
-                    Spacer()
-                    emptyCart
-                    Spacer()
-                }
-                .ignoresSafeArea()
+            if viewModel.doneOrder.isEmpty {
+                emptyOrderView
             } else {
                 ScrollView {
-                    LazyVStack {
-                        ForEach(filteredOrders.sorted(by: {$0.id ?? 0 > $1.id ?? 0})) { order in
-                            ShopOrderView(order: .constant(order))
+                    LazyVStack(spacing: 16) {
+                        ForEach(viewModel.doneOrder.sorted(by: { $0.id ?? 0 > $1.id ?? 0 })) { order in
+                            DeliveryPersonOrderView(order: order, viewModel: DeliveryPersonOrderViewModel())
                         }
                     }
+                    .padding()
                 }
                 .background(Color.gray.opacity(0.04))
             }
         }
     }
     
-    private var emptyCart : some View {
+    // MARK: - List Canceled Order View
+    private var listCanceledOrderView: some View {
+        ZStack {
+            if viewModel.cancelOrder.isEmpty {
+                emptyOrderView
+            } else {
+                ScrollView {
+                    LazyVStack(spacing: 16) {
+                        ForEach(viewModel.cancelOrder.sorted(by: { $0.id ?? 0 > $1.id ?? 0 })) { order in
+                            DeliveryPersonOrderView(order: order, viewModel: DeliveryPersonOrderViewModel())
+                        }
+                    }
+                    .padding()
+                }
+                .background(Color.gray.opacity(0.04))
+            }
+        }
+    }
+    
+    // MARK: - Empty Order View
+    private var emptyOrderView: some View {
         VStack {
-            Image("empty-cart")
+            Image(systemName: "tray")
                 .resizable()
                 .scaledToFit()
-                .frame(width: 250, height: 250)
-            Text("You have not order any food yet !")
+                .frame(width: 100, height: 100)
+                .foregroundColor(.gray.opacity(0.5))
+            Text("No orders yet!")
                 .font(.title3)
                 .foregroundStyle(.secondary)
-                .multilineTextAlignment(.center)
                 .bold()
                 .padding()
         }
     }
     
-    private var tabOrder : some View {
-        HStack {
-            HStack(spacing: 30){
-                ForEach(viewModel.tab, id: \.self) { statusTitle in
-                    VStack{
-                        Button{
-                            withAnimation(.easeInOut(duration: 0.2)) {
-                                viewModel.selectedTab = statusTitle
-                            }
-                        } label: {
-                            HStack(spacing: 6) {
-                                Text(statusTitle)
-                                    .font(.system(size: statusTitle == viewModel.selectedTab ? 16.5 : 16))
-                                    .fontWeight(statusTitle == viewModel.selectedTab ? .bold : .regular)
-                                    .foregroundColor(statusTitle != viewModel.selectedTab ? .secondary : Color.brandPrimaryColor)
-                                
-                                if let badgeColor = getStatusBadgeColor(for: statusTitle) {
-                                    let count = getOrderCount(for: statusTitle)
-                                        BadgeView(
-                                            count: count,
-                                            color: badgeColor
-                                    )
-                                    
-                                }
-                            }
+    private var tabBar: some View {
+        HStack(spacing: 30) {
+            ForEach(tabs, id: \.self) { tab in
+                Button {
+                    withAnimation(.easeInOut(duration: 0.2)) {
+                        selectedTab = tab
+                    }
+                } label: {
+                    VStack(spacing: 0) {
+                        Text(tab)
+                            .font(.system(size: tab == selectedTab ? 16.5 : 16))
+                            .fontWeight(tab == selectedTab ? .bold : .regular)
+                            .foregroundColor(tab == selectedTab ? .brandPrimaryColor : .secondary)
                             .padding(.vertical, 10)
-                        }
-                        .overlay(
-                            Rectangle()
-                                .frame(height: 2.5)
-                                .foregroundColor(statusTitle != viewModel.selectedTab ? .white.opacity(0) : Color.brandPrimaryColor)
-                                .animation(.easeInOut(duration: 0.2), value: viewModel.selectedTab)
-                            , alignment: .bottom
-                        )
-                        .id(statusTitle)
+                        
+                        Rectangle()
+                            .frame(height: 2.5)
+                            .foregroundColor(tab == selectedTab ? .brandPrimaryColor : .clear)
                     }
                 }
             }
         }
         .padding(.horizontal)
     }
-    
-    // Lấy số lượng orders cho status
-    private func getOrderCount(for statusTitle: String) -> Int {
-        viewModel.totalOrders.filter { $0.status.title == statusTitle }.count
-    }
-    
-    // Lấy badge color từ enum OrderStatus
-    private func getStatusBadgeColor(for statusTitle: String) -> Color? {
-        OrderStatus.allCases.first { $0.title == statusTitle }?.badgeColor
-    }
 }
 
+
+
+// MARK: - Preview
 #Preview {
     DeliveryPersonListHistoryOrderView()
 }

@@ -96,17 +96,17 @@ struct MockData {
         )
     ]
     
-    static let orderSample = OrderDto(id: 10,
-                                      customer: OrderDto.Customer(id: 0, fullName: "User Alice"),
-                                      shop: OrderDto.Shop(id: 1, name: "Chinese Food Traditional Error"),
-                                      items: [
-                                        OrderDto.OrderItem(id: 0, food: OrderDto.OrderItem.Food(id: 0, name: "Pizza", price: 4.99), quantity: 4),
-                                        OrderDto.OrderItem(id: 1, food: OrderDto.OrderItem.Food(id: 1, name: "Hamberger", price: 7.00 ), quantity: 2),
-                                        OrderDto.OrderItem(id: 2, food: OrderDto.OrderItem.Food(id: 2, name: "Bunbonuocleovitrasua", price: 10 ), quantity: 3
-                                                        )],
-                                      time: Date().timeIntervalSince1970,
-                                      status: .SHIPPING,
-                                      rating: 5
-    )
+//    static let orderSample = OrderDto(id: 10,
+//                                      customer: OrderDto.Customer(id: 0, fullName: "User Alice"),
+//                                      shop: OrderDto.Shop(id: 1, name: "Chinese Food Traditional Error"),
+//                                      items: [
+//                                        OrderDto.OrderItem(id: 0, food: OrderDto.OrderItem.Food(id: 0, name: "Pizza", price: 4.99), quantity: 4),
+//                                        OrderDto.OrderItem(id: 1, food: OrderDto.OrderItem.Food(id: 1, name: "Hamberger", price: 7.00 ), quantity: 2),
+//                                        OrderDto.OrderItem(id: 2, food: OrderDto.OrderItem.Food(id: 2, name: "Bunbonuocleovitrasua", price: 10 ), quantity: 3
+//                                                        )],
+//                                      time: Date().timeIntervalSince1970,
+//                                      status: .SHIPPING,
+//                                      rating: 5
+//    )
   
 }
